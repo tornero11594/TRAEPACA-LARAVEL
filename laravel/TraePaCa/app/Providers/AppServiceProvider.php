@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,5 +27,8 @@ class AppServiceProvider extends ServiceProvider
          //   'create' => 'crear',
            // 'edit'=>'editar',
         //]);
+
+        //forma de pasar a todas las vistas una misma variable
+        View::share('mensaje','Este es un mensaje de prueba');
     }
 }
