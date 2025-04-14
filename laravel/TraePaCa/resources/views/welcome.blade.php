@@ -1,3 +1,5 @@
+<!--Todas las vistas que vamos a crear tendrán la extensiín .blade.php y dentro tendrán codigo html-->
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

@@ -4,7 +4,10 @@ use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 //rutas de la app. Es lo que va despues del dominio
-Route::get('/',[HomeController::class,'index']
+//al no indicarle ningún método del controlador toma el que tenga invoke
+Route::get(
+    '/',
+    HomeController::class
     //return view('welcome');
 );
 //Deberiamos crear tantos controladores como temáticas específicas de la página
@@ -108,6 +111,8 @@ Route::get('/tupare/{id}',function($id){
 //Rutas necesarias para un crud
 
 //Ruta para mostrar el listado de registros. Utilizamos el controlador 
+/*
+
 Route::get('/posts',[PostController::class, 'index'])
     ->name('posts.index');
 
@@ -120,7 +125,7 @@ Route::post('/posts',[PostController::class, 'store'])
 ->name('posts.store');
 
 //Ruta para mostrar un registro
-Route::get('posts/{post}',[PostController::class,'show'])
+Route::get('/posts/{post}',[PostController::class,'show'])
 ->name('posts.show');
 
 //Ruta para mostar un registro para actualizarlo
@@ -134,3 +139,56 @@ Route::put('posts/{post}',[PostController::class,'update'])
 //Ruta para eliminar un registro
 Route::delete('posts/{post}',[PostController::class,'destroy'])
 ->name('posts.destroy');
+
+*/
+
+//Crear todas las rutas anteriores con una sola linea.  Asigna automáticamete cada URI a su método en específico. Debemos llamar a esos métodos por convención
+Route::resource('posts', PostController::class);
+//también podemos especificar las rutas que queremos que cree
+//Route::resource('posts',PostController::class)
+//  ->except('create','edit'); ES EXACTAMENTE LO MISMO QUE usar el método apiresource
+
+
+//para especificar solo unas rutas en específico:
+//Route::resource('posts',PostController::class)
+//  ->only('create','edit');
+
+
+//EN EL CASO DE QUE QUERAMOS CAMBIAR LA URI SIN MODIFICAR TODOS LOS MÉTODOS DEL CONTROLADOR, PODEMOS:
+//Route::resource('nombrenuevo',PostController::class)
+//  ->names('posts'); //esto llama a los metodos del controlador posts independientemente del nombre
+//->parameters(['nombrenuevo' => 'post']); //con esto lo que se hace es que los parámetros de nombrenuevo se llamen post
+
+//Vamos a crear un grupo de rutas que comparten el mismo Controlador. No hace falta por tanto definir el controlador, solo el metodo
+/*
+Route::prefix('posts')->name('posts.')->controller(PostController::class)->group(function () {
+
+    Route::get('/', 'index')
+        ->name('index');
+
+    //Ruta para mostrar un formulario para crear un registro
+    Route::get('/create', 'create')
+        ->name('create');
+
+    //Ruta para guardar un registro
+    Route::post('/', 'store')
+        ->name('store');
+
+    //Ruta para mostrar un registro
+    Route::get('/{post}', 'show')
+        ->name('show');
+
+    //Ruta para mostar un registro para actualizarlo
+    Route::get('/{post}/edit', 'edit')
+        ->name('edit');
+
+    //ruta para actualizar un registro
+    Route::put('/{post}', 'update')
+        ->name('update');
+
+    //Ruta para eliminar un registro
+    Route::delete('/{post}', 'destroy')
+        ->name('destroy');
+});
+
+*/

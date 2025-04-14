@@ -20,5 +20,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::pattern('id','[0-9]+');
+
+        //configurar que el nombre de las rutas se muestre en español por ejemplo
+       // Route::resourceVerbs([
+         //   'create' => 'crear',
+           // 'edit'=>'editar',
+        //]);
     }
 }

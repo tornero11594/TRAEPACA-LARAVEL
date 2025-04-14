@@ -9,27 +9,28 @@ class PostController extends Controller
     //toda la lógica de nuestra app va dentro de los controladores
     public function index()
     {
-        return "Hola desde la página de posts";
+        return view('post.index');
     }
 
     public function create()
     {
-        return "Aquí se mostrará el formulario para crear un posts";
+        return view('post.create');
     }
 
     public function store()
     {   
-        return "Aqui se procesará el formulario para crear un post";
+        return "Aquí se procesará el formulario para un post";
+
     }
 
     public function show($post)
     {
-        return "Aquí se mostrará el post: " .$post;
+        return view(view: 'post.show');
     }
 
     public function edit($post)
     {
-        return "Aquí se mostrará el formulario para editar el post ". $post;
+        return view(view: 'post.edit');
     }
 
 
