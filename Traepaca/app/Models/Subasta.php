@@ -10,6 +10,8 @@ class Subasta extends Model
 
     protected $table = 'Subasta';
 
+    protected $primaryKey = ['Vendedor', 'Producto']; // importante: son dos claves
+    public $incrementing = false; // <- muy importante: no hay ID autoincremental
     protected $fillable = [
         'Vendedor',
         'Producto',

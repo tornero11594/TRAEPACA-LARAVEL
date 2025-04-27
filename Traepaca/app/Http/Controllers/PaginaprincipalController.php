@@ -22,21 +22,15 @@ class PaginaprincipalController extends Controller
     public function buscar(Request $request)
     {
         $query = $request->input('q');
-
-        $subastas = DB::table('Subasta')
-            ->join('Producto', 'Subasta.Producto', '=', 'Producto.ID_PRODUCTO')
-            ->select('Subasta.*', 'Producto.Nombre', 'Producto.Descripción', 'Producto.Foto')
-            ->where('Producto.Nombre', 'like', '%' . $query . '%')
-            ->orderBy('Subasta.Fecha_fin')
-            ->get();
-
-        $fechaActual = Carbon::now();
-
-        return view('paginaprincipal', [
-            'subastas' => $subastas,
-            'fechaActual' => $fechaActual,
-            'busqueda' => $query
-        ]);
+    
+        $subastas = Subasta::whereHas('producto', function($q) use ($query) {
+            $q->where('Nombre', 'like', '%' . $query . '%');
+        })
+        ->where('Fecha_fin', '>=', Carbon::now())  // Solo subastas activas
+        ->with('producto') //  Aquí cargamos la relación
+        ->get();
+    
+        return view('paginaprincipal', compact('subastas'));
     }
 
 }

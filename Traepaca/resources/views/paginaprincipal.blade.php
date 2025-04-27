@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>TraePaCa - Subastas</title>
@@ -130,17 +131,19 @@
     <!-- 🎯 Contenido principal -->
     <div class="relative z-10">
         <header class="casino-header">
-            <div class="logo-text glow-text">
+            <a href="{{ route('paginaprincipal') }}" class="logo-text glow-text hover:scale-105 transition">
                 🎰 <span class="text-shadow">TraePaCa</span>
-            </div>
+            </a>
+
             <form action="{{ route('buscar') }}" method="GET" class="flex items-center ml-auto">
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="🔍 Buscar producto..."
                     class="rounded-l px-3 py-1 border-none focus:outline-none text-black" />
-                <button type="submit" class="bg-yellow-400 px-3 py-1 rounded-r text-black font-bold hover:bg-yellow-300">
+                <button type="submit"
+                    class="bg-yellow-400 px-3 py-1 rounded-r text-black font-bold hover:bg-yellow-300">
                     Buscar
                 </button>
             </form>
-            
+
             <nav>
                 <a href="#" class="nav-link">Mis Pujas</a>
                 @if (auth()->check() && auth()->user()->Administrador)
@@ -148,37 +151,72 @@
                     <a href="#" class="nav-link">Productos de todos los Usuarios</a>
                 @endif
             </nav>
-            
+
         </header>
 
         <h1 class="titulo-brillante">🎲 Productos en Subastas 🎲</h1>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 py-10">
             @foreach ($subastas as $subasta)
-                <div class="card bg-black bg-opacity-80 border-2 border-yellow-400 rounded-lg shadow-xl p-4">
-                    <h3 class="text-xl font-bold text-yellow-400 flex items-center gap-2 mb-2">
-                        🎯 {{ $subasta->producto->Nombre }}
-                    </h3>
-                    <p class="text-gray-200 mb-2">{{ $subasta->producto->Descripción }}</p>
+                <div class="card bg-black bg-opacity-80 border-2 border-yellow-400 rounded-lg shadow-xl p-6 flex flex-col">
 
-                    @if ($subasta->producto->Foto)
-                        <img src="data:image/jpeg;base64,{{ base64_encode($subasta->producto->Foto) }}" alt="Imagen del producto"
-                            class="w-full h-48 object-cover rounded-lg mb-4">
-                    @endif
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-bold text-yellow-400 flex justify-center items-center gap-2 mb-2">
+                            🎯 {{ $subasta->producto->Nombre }}
+                        </h3>
+                        <p class="text-gray-300">{{ $subasta->producto->Descripción }}</p>
+                    </div>
 
-                    <p class="text-white">💰 <strong>Precio actual:</strong> {{ $subasta->Precio_actual }} monedas</p>
-                    <p class="text-white">📅 <strong>Activa desde:</strong>
-                        {{ \Carbon\Carbon::parse($subasta->Fecha_inicio)->format('d/m/Y') }}</p>
-                    <p class="text-white">⏰ <strong>Finaliza:</strong>
-                        {{ \Carbon\Carbon::parse($subasta->Fecha_fin)->format('d/m/Y') }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        @if ($subasta->producto->Foto)
+                            <img src="data:image/jpeg;base64,{{ base64_encode($subasta->producto->Foto) }}"
+                                alt="Imagen del producto" class="w-full max-h-72 object-contain rounded-lg shadow-md">
+                        @endif
 
-                    <a href="{{ route('pujar', ['vendedor' => $subasta->Vendedor, 'producto' => $subasta->Producto]) }}"
-                        class="btn-pujar mt-4 inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 rounded shadow-lg transition">
-                        🎰 Pujar
-                    </a>
+                        <div class="flex flex-col justify-center space-y-2 text-white">
+                            <p>💰 <strong>Precio actual:</strong> {{ $subasta->Precio_actual }} monedas</p>
+                            <p>📅 <strong>Activa desde:</strong>
+                                {{ \Carbon\Carbon::parse($subasta->Fecha_inicio)->format('d/m/Y') }}</p>
+                            <p>⏰ <strong>Finaliza:</strong>
+                                {{ \Carbon\Carbon::parse($subasta->Fecha_fin)->format('d/m/Y') }}</p>
+
+                            @if (\Carbon\Carbon::now()->lt(\Carbon\Carbon::parse($subasta->Fecha_fin)))
+                                <a href="{{ route('pujar', ['vendedor' => $subasta->Vendedor, 'producto' => $subasta->Producto]) }}"
+                                    class="btn-pujar mt-4 inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 rounded shadow-lg transition">
+                                    🎰 Pujar
+                                </a>
+                            @else
+                                <div class="mt-4 text-center bg-red-600 text-white font-bold py-2 px-4 rounded shadow-lg">
+                                    ⛔ Subasta Finalizada
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
                 </div>
             @endforeach
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Enhorabuena!',
+                    text: '{{ session('success') }}',
+                    confirmButtonColor: '#FFD700',
+                    background: '#111',
+                    color: '#fff',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
+            </script>
+        @endif
+
+
     </div>
 
     <!-- 🎯 Animación fondo -->
@@ -228,4 +266,5 @@
         animate();
     </script>
 </body>
+
 </html>

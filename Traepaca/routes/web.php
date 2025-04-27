@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaginaprincipalController;
+use App\Http\Controllers\PujaController;
 
 Route::get('/registro', [AuthController::class, 'showRegisterForm'])->name('register.form');
 Route::post('/registro', [AuthController::class, 'register'])->name('register');
@@ -14,7 +15,8 @@ Route::get('/paginaprincipal', [PaginaprincipalController::class, 'index'])->nam
 
 Route::get('/paginaprincipal', [PaginaprincipalController::class, 'index'])->name('paginaprincipal');
 
-Route::get('/pujar/{vendedor}/{producto}', [PujaController::class, 'show'])->name('pujar');
+Route::get('/pujar/{vendedor}/{producto}', [PujaController::class, 'mostrarFormulario'])->name('pujar');
+Route::post('/pujar/{vendedor}/{producto}', [PujaController::class, 'realizarPuja'])->name('realizar.puja');
 Route::get('/buscar', [PaginaprincipalController::class, 'buscar'])->name('buscar');
 
 
