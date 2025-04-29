@@ -29,7 +29,7 @@ class PujaController extends Controller
         ->where('Producto', $producto)
         ->update(['Precio_actual' => $request->cantidad]);
  
-
+        
         return redirect()->route('paginaprincipal')->with('success', '¡Puja realizada con éxito!');
     }
     

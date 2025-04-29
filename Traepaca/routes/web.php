@@ -2,7 +2,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaginaprincipalController;
 use App\Http\Controllers\PujaController;
-
+use App\Http\Controllers\HistorialPujasController;
 Route::get('/registro', [AuthController::class, 'showRegisterForm'])->name('register.form');
 Route::post('/registro', [AuthController::class, 'register'])->name('register');
 
@@ -20,4 +20,8 @@ Route::post('/pujar/{vendedor}/{producto}', [PujaController::class, 'realizarPuj
 Route::get('/buscar', [PaginaprincipalController::class, 'buscar'])->name('buscar');
 
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/historial-pujas', [HistorialPujasController::class, 'index'])->name('historial.pujas');
+    Route::delete('/historial-pujas/{vendedor}/{producto}', [HistorialPujasController::class, 'destroy'])->name('historial.pujas.destroy');
+});
 ?>

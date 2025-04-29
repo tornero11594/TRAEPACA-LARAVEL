@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>TraePaCa - Subastas</title>
+    <title>TraePaCa - Historial de Pujas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
@@ -128,123 +128,138 @@
         <canvas id="casinoParticles"></canvas>
     </div>
 
-    
-    <!-- 🎯 Contenido principal -->
     <div class="relative z-10">
         <header class="casino-header">
             <a href="{{ route('paginaprincipal') }}" class="logo-text glow-text hover:scale-105 transition">
                 🎰 <span class="text-shadow">TraePaCa</span>
             </a>
-
             <div class="flex items-center ml-auto space-x-4">
-                @if (auth()->check())
-                    <div class="flex items-center text-black font-bold bg-yellow-300 px-4 py-1 rounded shadow-md">
-                        💰 {{ auth()->user()->Monedas ?? 0 }} Monedas
-                    </div>
-
-                @endif
-
-                <form action="{{ route('buscar') }}" method="GET" class="flex items-center">
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="🔍 Buscar producto..."
-                        class="rounded-l px-3 py-1 border-none focus:outline-none text-black" />
-                    <button type="submit"
-                        class="bg-yellow-400 px-3 py-1 rounded-r text-black font-bold hover:bg-yellow-300">
-                        Buscar
-                    </button>
-                </form>
-
-                <nav class="flex items-center space-x-4">
-                    <a href="#" class="nav-link">Mis Pujas</a>
-                    @if (auth()->check() && auth()->user()->Administrador)
-                        <a href="{{ route('historial.pujas') }}" class="nav-link">Historial de Pujas</a>
-                        <a href="#" class="nav-link">Productos de todos los Usuarios</a>
-                    @endif
-                </nav>
+                <a href="{{ route('paginaprincipal') }}" class="nav-link">🏠 Volver a Principal</a>
             </div>
         </header>
 
-
-        <h1 class="titulo-brillante">🎲 Productos en Subastas 🎲</h1>
+        <h1 class="titulo-brillante">📜 Historial de Pujas 📜</h1>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 py-10">
             @foreach ($subastas as $subasta)
-                <div class="card bg-black bg-opacity-80 border-2 border-yellow-400 rounded-lg shadow-xl p-6 flex flex-col">
-
-                    <div class="text-center mb-6">
-                        <h3 class="text-2xl font-bold text-yellow-400 flex justify-center items-center gap-2 mb-2">
-                            🎯 {{ $subasta->producto->Nombre }}
-                        </h3>
-                        <p class="text-gray-300">{{ $subasta->producto->Descripción }}</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <div class="card bg-black bg-opacity-80 border-2 border-yellow-400 rounded-lg shadow-xl p-4 flex flex-col">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-6">
+        
+                        {{-- Imagen del producto a la izquierda --}}
                         @if ($subasta->producto->Foto)
                             <img src="data:image/jpeg;base64,{{ base64_encode($subasta->producto->Foto) }}"
-                                alt="Imagen del producto" class="w-full max-h-72 object-contain rounded-lg shadow-md">
+                                alt="Imagen del producto" class="w-full md:w-40 h-40 object-contain rounded-lg shadow-md">
                         @endif
-
-                        <div class="flex flex-col justify-center space-y-2 text-white">
+        
+                        {{-- Info del producto a la derecha --}}
+                        <div class="flex-1 text-center md:text-left">
+                            <h3 class="text-2xl font-bold text-yellow-400 mb-2">
+                                🎯 {{ $subasta->producto->Nombre }}
+                            </h3>
+                            <p class="text-gray-300 mb-1">{{ $subasta->producto->Descripción }}</p>
                             <p>💰 <strong>Precio actual:</strong> {{ $subasta->Precio_actual }} monedas</p>
-                            <p>📅 <strong>Activa desde:</strong>
+                            <p>📅 <strong>Inicio:</strong>
                                 {{ \Carbon\Carbon::parse($subasta->Fecha_inicio)->format('d/m/Y') }}</p>
-                            <p>⏰ <strong>Finaliza:</strong>
-                                {{ \Carbon\Carbon::parse($subasta->Fecha_fin)->format('d/m/Y') }}</p>
-
-                            @if (\Carbon\Carbon::now()->lt(\Carbon\Carbon::parse($subasta->Fecha_fin)))
-                                <a href="{{ route('pujar', ['vendedor' => $subasta->Vendedor, 'producto' => $subasta->Producto]) }}"
-                                    class="btn-pujar mt-4 inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 rounded shadow-lg transition">
-                                    🎰 Pujar
-                                </a>
-                            @else
-                                <div class="mt-4 text-center bg-red-600 text-white font-bold py-2 px-4 rounded shadow-lg">
-                                    ⛔ Subasta Finalizada
-                                </div>
-                            @endif
+                            <p>⏰ <strong>Fin:</strong> {{ \Carbon\Carbon::parse($subasta->Fecha_fin)->format('d/m/Y') }}</p>
                         </div>
                     </div>
-
+        
+                    {{-- Botones centrados abajo --}}
+                    <div class="mt-4 flex flex-col items-center space-y-2">
+                        @if (\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($subasta->Fecha_fin)))
+                            <div class="bg-red-600 text-white font-bold py-2 px-4 rounded">
+                                ⛔ Subasta Finalizada
+                            </div>
+                        @else
+                            <div class="bg-green-500 text-white font-bold py-2 px-4 rounded">
+                                ✅ Subasta Activa
+                            </div>
+                        @endif
+        
+                        <form
+                            action="{{ route('historial.pujas.destroy', ['vendedor' => $subasta->Vendedor, 'producto' => $subasta->Producto]) }}"
+                            method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded shadow">
+                                🗑️ Eliminar Subasta
+                            </button>
+                        </form>
+                    </div>
                 </div>
             @endforeach
         </div>
+        
+        <div class="px-6 pb-16">
+            <h2 class="text-3xl text-yellow-400 font-bold mt-12 mb-6 text-center">📊 Historial Completo de Subastas</h2>
+        
+            <div class="overflow-x-auto rounded-lg shadow-xl bg-gradient-to-r from-black via-gray-900 to-black p-6 border border-yellow-400">
+                <table class="min-w-full table-auto border-separate border-spacing-y-4 text-sm text-white">
+                    <thead class="bg-yellow-500 text-black text-lg uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-3 text-left rounded-l-lg">🧾 Producto</th>
+                            <th class="px-6 py-3 text-left">👤 Comprador</th>
+                            <th class="px-6 py-3 text-left">💰 Precio</th>
+                            <th class="px-6 py-3 text-left">📅 Inicio</th>
+                            <th class="px-6 py-3 text-left">⏰ Fin</th>
+                            <th class="px-6 py-3 text-left rounded-r-lg">📌 Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($subastas as $subasta)
+                            <tr class="bg-gray-800 hover:bg-gray-700 transition duration-200 rounded-lg shadow-md">
+                                <td class="px-6 py-3 font-semibold text-yellow-300">
+                                    {{ $subasta->producto->Nombre }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    @if ($subasta->Comprador)
+                                        {{ \App\Models\User::find($subasta->Comprador)?->Nombre ?? 'Desconocido' }}
+                                    @else
+                                        <span class="text-gray-400 italic">Sin comprador</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-3 text-green-300">
+                                    {{ $subasta->Precio_actual }} monedas
+                                </td>
+                                <td class="px-6 py-3">
+                                    {{ \Carbon\Carbon::parse($subasta->Fecha_inicio)->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    {{ \Carbon\Carbon::parse($subasta->Fecha_fin)->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-3">
+                                    @if (\Carbon\Carbon::now()->lt(\Carbon\Carbon::parse($subasta->Fecha_fin)))
+                                        <span class="bg-green-600 text-white font-bold px-3 py-1 rounded shadow">Activa</span>
+                                    @else
+                                        <span class="bg-red-600 text-white font-bold px-3 py-1 rounded shadow">Finalizada</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         @if (session('success'))
             <script>
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Enhorabuena!',
+                    title: '¡Acción completada!',
                     text: '{{ session('success') }}',
                     confirmButtonColor: '#FFD700',
-                    background: '#111',
-                    color: '#fff',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    }
-                });
-            </script>
-        @endif
-        @if (session('error'))
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '{{ session('error') }}',
-                    confirmButtonColor: '#FF0000',
                     background: '#111',
                     color: '#fff'
                 });
             </script>
         @endif
-
-
-
     </div>
 
-    <!-- 🎯 Animación fondo -->
     <script>
-        const canvas = document.getElementById('casinoParticles');
+           const canvas = document.getElementById('casinoParticles');
         const ctx = canvas.getContext('2d');
 
         canvas.width = window.innerWidth;
