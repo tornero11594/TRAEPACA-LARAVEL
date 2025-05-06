@@ -34,5 +34,9 @@ class Subasta extends Model
         return $this->belongsTo(Producto::class, 'Producto', 'ID_PRODUCTO');
     }
 
+    public function comprador()
+{
+    return $this->belongsTo(User::class, 'Comprador', 'id');
+}
 
 }

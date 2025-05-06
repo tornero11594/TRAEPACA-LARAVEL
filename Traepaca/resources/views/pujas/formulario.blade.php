@@ -67,8 +67,13 @@
         }
 
         @keyframes pulse {
-            0% { text-shadow: 0 0 10px #FFD700; }
-            100% { text-shadow: 0 0 30px #FF8C00; }
+            0% {
+                text-shadow: 0 0 10px #FFD700;
+            }
+
+            100% {
+                text-shadow: 0 0 30px #FF8C00;
+            }
         }
     </style>
 </head>
@@ -85,8 +90,7 @@
 
         <div class="card grid grid-cols-1 md:grid-cols-2 gap-8">
             @if ($subasta->producto->Foto)
-                <img src="data:image/jpeg;base64,{{ base64_encode($subasta->producto->Foto) }}" 
-                    alt="Imagen del producto"
+                <img src="data:image/jpeg;base64,{{ base64_encode($subasta->producto->Foto) }}" alt="Imagen del producto"
                     class="w-full max-h-80 object-contain rounded-lg shadow-md">
             @endif
 
@@ -96,21 +100,31 @@
 
                 <p class="text-white mb-2"><strong>💰 Precio actual:</strong> {{ $subasta->Precio_actual }} monedas</p>
 
-                <form action="{{ route('realizar.puja', ['vendedor' => $subasta->Vendedor, 'producto' => $subasta->Producto]) }}" method="POST" class="space-y-4 mt-4">
-                    @csrf
-                    <div>
-                        <label for="cantidad" class="block mb-2 text-yellow-300 font-semibold">Cantidad a pujar:</label>
-                        <input type="number" name="cantidad" id="cantidad" min="{{ $subasta->Precio_actual + 1 }}"
-                            class="w-full p-2 rounded bg-gray-800 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white" required>
+                @if (auth()->check() && auth()->user()->getKey() != $subasta->Vendedor)
+                    <form
+                        action="{{ route('realizar.puja', ['vendedor' => $subasta->Vendedor, 'producto' => $subasta->Producto]) }}"
+                        method="POST" class="space-y-4 mt-4">
+                        @csrf
+                        <div>
+                            <label for="cantidad" class="block mb-2 text-yellow-300 font-semibold">Cantidad a pujar:</label>
+                            <input type="number" name="cantidad" id="cantidad" min="{{ $subasta->Precio_actual + 1 }}"
+                                class="w-full p-2 rounded bg-gray-800 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white"
+                                required>
+                        </div>
+
+                        <button type="submit" class="btn-pujar w-full py-2 rounded shadow-lg transition">
+                            💸 Realizar Puja
+                        </button>
+                    </form>
+                @else
+                    <div class="mt-6 bg-red-700 text-white p-4 rounded text-center font-bold shadow">
+                        ⚠️ No puedes pujar en tu propia subasta.
                     </div>
+                @endif
 
-                    <button type="submit"
-                        class="btn-pujar w-full py-2 rounded shadow-lg transition">
-                        💸 Realizar Puja
-                    </button>
-                </form>
 
-                <a href="{{ route('paginaprincipal') }}" class="mt-6 inline-block text-yellow-400 hover:text-white transition text-center">
+                <a href="{{ route('paginaprincipal') }}"
+                    class="mt-6 inline-block text-yellow-400 hover:text-white transition text-center">
                     ⬅️ Volver a subastas
                 </a>
             </div>
@@ -164,4 +178,5 @@
         animate();
     </script>
 </body>
+
 </html>

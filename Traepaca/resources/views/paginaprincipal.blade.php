@@ -154,11 +154,19 @@
                 </form>
 
                 <nav class="flex items-center space-x-4">
-                    <a href="#" class="nav-link">Mis Pujas</a>
+                    <a href="{{route('mispujas.index')}}" class="nav-link">Mis Pujas</a>
                     @if (auth()->check() && auth()->user()->Administrador)
                         <a href="{{ route('historial.pujas') }}" class="nav-link">Historial de Pujas</a>
-                        <a href="#" class="nav-link">Productos de todos los Usuarios</a>
+                        <a href="{{route('productos.usuarios')}}" class="nav-link">Productos de todos los Usuarios</a>
                     @endif
+                    <form action="{{ route('logout') }}" method="POST" class="ml-4">
+                        @csrf
+                        <button type="submit"
+                            class="nav-link bg-red-500 text-white px-3 py-1 rounded hover:bg-red-400 transition font-bold">
+                             Cerrar sesión
+                        </button>
+                    </form>
+                
                 </nav>
             </div>
         </header>
